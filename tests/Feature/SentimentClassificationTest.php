@@ -25,7 +25,7 @@ class SentimentClassificationTest extends TestCase
             'comment' => 'PKKMB sangat seru, panitianya ramah dan acaranya teratur.',
         ]);
 
-        $response->assertOk()->assertSee('Positif')->assertSee('1 komentar dianalisis')->assertSee('Distribusi sentimen')->assertSee('100.0%')->assertSee('Komentar menunjukkan pengalaman yang menyenangkan.');
+        $response->assertOk()->assertSee('Positif')->assertSee('1 komentar dianalisis')->assertSee('Jumlah komentar')->assertSee('100.0%')->assertSee('Komentar menunjukkan pengalaman yang menyenangkan.');
     }
 
     public function test_comments_can_be_classified_from_a_csv_file(): void
@@ -73,8 +73,8 @@ class SentimentClassificationTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('komentar.csv', "komentar\n".implode("\n", $comments));
         $response = $this->post('/classify', ['file' => $file]);
 
-        $response->assertOk()->assertSee('41 komentar dianalisis');
-        Http::assertSentCount(2);
+        $response->assertOk()->assertSee('41 komentar dianalisis')->assertSee('page-info')->assertSee('const pageSize = 30;');
+        Http::assertSentCount(3);
     }
 
     public function test_gemini_api_errors_are_returned_as_a_user_message(): void

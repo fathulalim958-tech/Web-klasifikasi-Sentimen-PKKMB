@@ -21,6 +21,9 @@
         @media (max-width: 700px) { .donut-panel { justify-content: center; } }
         .visual-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }.visual-row .chart-panel, .visual-row .donut-panel { margin-top: 0; }.search-panel { margin-top: 18px; padding: 20px 24px; background: rgba(255,255,255,.72); border: 1px solid var(--line); }.search-label { display: block; margin-bottom: 10px; color: var(--muted); font: 11px 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }.search-input { width: 100%; padding: 13px 15px; color: var(--ink); background: #fbfcf8; border: 1px solid var(--line); outline: none; font: 13px 'Manrope', sans-serif; }.search-input:focus { border-color: var(--green); }.search-result-count { display: block; margin-top: 9px; color: var(--muted); font: 10px 'DM Mono', monospace; }
         @media (max-width: 700px) { .visual-row { grid-template-columns: 1fr; } }
+        .pagination { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: rgba(255,255,255,.72); border: 1px solid var(--line); border-top: 0; }.pagination button { padding: 8px 13px; color: var(--green); background: transparent; border: 1px solid var(--line); font: 11px 'DM Mono', monospace; cursor: pointer; }.pagination button:disabled { color: #b5bbb2; cursor: not-allowed; }.page-info { color: var(--muted); font: 10px 'DM Mono', monospace; }
+        .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }.filter-select { width: 100%; padding: 11px 12px; color: var(--ink); background: #fbfcf8; border: 1px solid var(--line); outline: none; font: 12px 'Manrope', sans-serif; }.filter-select:focus { border-color: var(--green); }
+        @media (max-width: 700px) { .filter-row { grid-template-columns: 1fr; } }
     </style>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -61,14 +64,14 @@
                     <div class="summary-card negative"><span class="summary-label">Negatif</span><strong>{{ $summary['negative'] }}</strong><span class="summary-note">perlu perhatian</span></div>
                 </div>
                 <div class="visual-row"><div class="chart-panel" aria-label="Grafik distribusi sentimen">
-                    <h3 class="chart-title">Distribusi sentimen</h3>
-                    <div class="chart-row"><span class="chart-label">Positif</span><span class="chart-track"><i class="chart-bar positive" style="width: {{ $summary['total'] ? ($summary['positive'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['total'] ? number_format(($summary['positive'] / $summary['total']) * 100, 1) : 0 }}%</span></div>
-                    <div class="chart-row"><span class="chart-label">Netral</span><span class="chart-track"><i class="chart-bar neutral" style="width: {{ $summary['total'] ? ($summary['neutral'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['total'] ? number_format(($summary['neutral'] / $summary['total']) * 100, 1) : 0 }}%</span></div>
-                    <div class="chart-row"><span class="chart-label">Negatif</span><span class="chart-track"><i class="chart-bar negative" style="width: {{ $summary['total'] ? ($summary['negative'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['total'] ? number_format(($summary['negative'] / $summary['total']) * 100, 1) : 0 }}%</span></div>
+                    <h3 class="chart-title">Jumlah komentar</h3>
+                    <div class="chart-row"><span class="chart-label">Positif</span><span class="chart-track"><i class="chart-bar positive" style="width: {{ $summary['total'] ? ($summary['positive'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['positive'] }}</span></div>
+                    <div class="chart-row"><span class="chart-label">Netral</span><span class="chart-track"><i class="chart-bar neutral" style="width: {{ $summary['total'] ? ($summary['neutral'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['neutral'] }}</span></div>
+                    <div class="chart-row"><span class="chart-label">Negatif</span><span class="chart-track"><i class="chart-bar negative" style="width: {{ $summary['total'] ? ($summary['negative'] / $summary['total']) * 100 : 0 }}%"></i></span><span class="chart-value">{{ $summary['negative'] }}</span></div>
                 </div>
-                </div><div class="donut-panel" aria-label="Diagram donut distribusi sentimen"><div class="donut"><div class="donut-total"><strong>{{ $summary['total'] }}</strong><span>komentar</span></div></div><div class="legend"><div class="legend-item"><i class="legend-dot positive"></i><span>Positif</span><small>{{ $summary['positive'] }}</small></div><div class="legend-item"><i class="legend-dot neutral"></i><span>Netral</span><small>{{ $summary['neutral'] }}</small></div><div class="legend-item"><i class="legend-dot negative"></i><span>Negatif</span><small>{{ $summary['negative'] }}</small></div></div></div></div>
-                <div class="search-panel"><label class="search-label" for="comment-search">Cari komentar</label><input class="search-input" id="comment-search" type="search" placeholder="Ketik kata atau sentimen, misalnya negatif..."><span class="search-result-count" id="search-result-count">{{ $summary['total'] }} hasil ditampilkan</span></div>
-                <div class="table-wrap"><table><thead><tr><th>Komentar</th><th>Hasil klasifikasi</th><th>Keterangan</th><th>Keyakinan</th></tr></thead><tbody>@foreach ($results as $result)<tr><td>{{ $result['comment'] }}</td><td><span class="pill {{ strtolower($result['label']) }}"><span></span>{{ $result['label'] }}</span></td><td class="explanation">{{ $result['explanation'] }}</td><td><div class="confidence"><span class="confidence-bar"><i style="width: {{ $result['confidence'] }}%"></i></span><small>{{ $result['confidence'] }}%</small></div></td></tr>@endforeach</tbody></table></div>
+                <div class="donut-panel" aria-label="Diagram donut persentase sentimen"><div class="donut"><div class="donut-total"><strong>100%</strong><span>distribusi</span></div></div><div class="legend"><div class="legend-item"><i class="legend-dot positive"></i><span>Positif</span><small>{{ $summary['total'] ? number_format(($summary['positive'] / $summary['total']) * 100, 1) : 0 }}%</small></div><div class="legend-item"><i class="legend-dot neutral"></i><span>Netral</span><small>{{ $summary['total'] ? number_format(($summary['neutral'] / $summary['total']) * 100, 1) : 0 }}%</small></div><div class="legend-item"><i class="legend-dot negative"></i><span>Negatif</span><small>{{ $summary['total'] ? number_format(($summary['negative'] / $summary['total']) * 100, 1) : 0 }}%</small></div></div></div></div>
+                <div class="search-panel"><label class="search-label" for="comment-search">Cari dan filter hasil</label><input class="search-input" id="comment-search" type="search" placeholder="Ketik kata atau sentimen, misalnya negatif..."><div class="filter-row"><select class="filter-select" id="sentiment-filter" aria-label="Filter sentimen"><option value="">Semua sentimen</option><option value="positif">Positif</option><option value="netral">Netral</option><option value="negatif">Negatif</option></select><select class="filter-select" id="confidence-filter" aria-label="Filter confidence"><option value="0">Semua tingkat keyakinan</option><option value="80">Minimal 80%</option><option value="90">Minimal 90%</option></select></div><span class="search-result-count" id="search-result-count">{{ $summary['total'] }} hasil ditampilkan</span></div>
+                <div class="table-wrap"><table><thead><tr><th>Komentar</th><th>Hasil klasifikasi</th><th>Keterangan</th><th>Keyakinan</th></tr></thead><tbody>@foreach ($results as $result)<tr><td>{{ $result['comment'] }}</td><td><span class="pill {{ strtolower($result['label']) }}"><span></span>{{ $result['label'] }}</span></td><td class="explanation">{{ $result['explanation'] }}</td><td><div class="confidence"><span class="confidence-bar"><i style="width: {{ $result['confidence'] }}%"></i></span><small>{{ $result['confidence'] }}%</small></div></td></tr>@endforeach</tbody></table></div><nav class="pagination" aria-label="Navigasi halaman komentar"><button id="previous-page" type="button">← Sebelumnya</button><span class="page-info" id="page-info"></span><button id="next-page" type="button">Berikutnya →</button></nav>
             </section>
         @else
             <section class="empty-state"><span class="empty-icon">✦</span><div><strong>Insight kamu akan muncul di sini</strong><p>Hasil klasifikasi dan ringkasan distribusi sentimen siap dibaca dalam sekali klik.</p></div></section>
@@ -85,16 +88,45 @@
     if (searchInput) {
         const rows = Array.from(document.querySelectorAll('.table-wrap tbody tr'));
         const resultCount = document.getElementById('search-result-count');
-        searchInput.addEventListener('input', function () {
-            const query = this.value.trim().toLowerCase();
-            let visibleRows = 0;
-            rows.forEach((row) => {
-                const matches = row.textContent.toLowerCase().includes(query);
-                row.hidden = !matches;
-                visibleRows += matches ? 1 : 0;
+        const sentimentFilter = document.getElementById('sentiment-filter');
+        const confidenceFilter = document.getElementById('confidence-filter');
+        const pageInfo = document.getElementById('page-info');
+        const previousPage = document.getElementById('previous-page');
+        const nextPage = document.getElementById('next-page');
+        const pageSize = 30;
+        let currentPage = 1;
+        let filteredRows = rows;
+        const renderPage = () => {
+            const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+            currentPage = Math.min(currentPage, totalPages);
+            const firstItem = filteredRows.length ? (currentPage - 1) * pageSize + 1 : 0;
+            const lastItem = Math.min(currentPage * pageSize, filteredRows.length);
+            rows.forEach((row) => { row.hidden = true; });
+            filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize).forEach((row) => { row.hidden = false; });
+            resultCount.textContent = `${filteredRows.length} hasil ditampilkan`;
+            pageInfo.textContent = `Menampilkan ${firstItem}-${lastItem} dari ${filteredRows.length} komentar | Halaman ${currentPage} dari ${totalPages}`;
+            previousPage.disabled = currentPage === 1;
+            nextPage.disabled = currentPage === totalPages;
+        };
+        const updateFilters = () => {
+            const query = searchInput.value.trim().toLowerCase();
+            const sentiment = sentimentFilter.value;
+            const minimumConfidence = Number(confidenceFilter.value);
+            filteredRows = rows.filter((row) => {
+                const matchesQuery = row.textContent.toLowerCase().includes(query);
+                const matchesSentiment = !sentiment || row.querySelector('.pill')?.classList.contains(sentiment);
+                const confidence = Number(row.querySelector('.confidence small')?.textContent.replace('%', '') || 0);
+                return matchesQuery && matchesSentiment && confidence >= minimumConfidence;
             });
-            resultCount.textContent = `${visibleRows} hasil ditampilkan`;
-        });
+            currentPage = 1;
+            renderPage();
+        };
+        searchInput.addEventListener('input', updateFilters);
+        sentimentFilter.addEventListener('change', updateFilters);
+        confidenceFilter.addEventListener('change', updateFilters);
+        previousPage.addEventListener('click', () => { currentPage -= 1; renderPage(); });
+        nextPage.addEventListener('click', () => { currentPage += 1; renderPage(); });
+        renderPage();
     }
 </script>
 </body>

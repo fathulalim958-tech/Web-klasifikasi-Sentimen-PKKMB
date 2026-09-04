@@ -11,9 +11,9 @@ use RuntimeException;
 
 class GeminiSentimentService
 {
-    private const BATCH_SIZE = 40;
+    private const BATCH_SIZE = 20;
 
-    private const MAX_PARALLEL_BATCHES = 5;
+    private const MAX_PARALLEL_BATCHES = 2;
 
     public function classify(array $comments): array
     {
@@ -36,7 +36,10 @@ class GeminiSentimentService
                             ->as('batch_'.$batchIndex)
                             ->connectTimeout(5)
                             ->timeout(20)
-                            ->retry([200, 500], 1)
+                            ->retry([1000, 3000, 6000], 2, function (\Throwable $exception): bool {
+                                return $exception instanceof ConnectionException
+                                    || ($exception instanceof RequestException && $exception->response->status() === 429);
+                            })
                             ->post($this->endpoint($apiKey), [
                                 'contents' => [['parts' => [['text' => $this->prompt($batch)]]]],
                                 'generationConfig' => [
